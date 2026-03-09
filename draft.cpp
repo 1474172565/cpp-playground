@@ -44,14 +44,18 @@ void Print_list(Linked_list &Head){// 逐个打印
 void Push_back(Linked_list &Head , Linked_list &B)//把链表 放到 最后 （赋值）
 {
   Linked_list* current = &Head;
-  Linked_list* b = &B;
 
   while(current->next != nullptr)
   {
     current = current->next.get();
   }
 
-  current->next.reset(b);
+  auto middle = std::make_unique<Linked_list> ();
+  middle->name = B.name;
+  middle->num = B.num;
+  middle->next = nullptr;
+
+  current->next = std::move(middle); // current->next.reset(b); 堆上 unique 指针 不能管理 栈上的 指针 ， 用make_unique
 }
 
 int main()
