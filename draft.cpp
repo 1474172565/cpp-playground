@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 struct Linked_list{
   std::string name;
@@ -24,7 +25,8 @@ void emplace_list(Linked_list &Head , const std::string &name ,const int num) //
 void erase_list(Linked_list &Head , const int index) // 第 index 个链表之后删除
 {
   Linked_list* current = &Head;
-  for(int i = 0 ; i <= index ; ++i){
+  for(int i = 0 ; i < index ; ++i)
+  {
     current = current->next.get();
   }
 
@@ -55,7 +57,23 @@ void Push_back(Linked_list &Head , Linked_list &B)//把链表 放到 最后 （�
   middle->num = B.num;
   middle->next = nullptr;
 
-  current->next = std::move(middle); // current->next.reset(b); 堆上 unique 指针 不能管理 栈上的 指针 ， 用make_unique
+  current->next = std::move(middle); //Linked_list* b.......... '\n' current->next.reset(b); 堆上 unique 指针 不能管理 栈上的 指针 ， 用make_unique
+}
+
+void Insert_list(Linked_list &Head , Linked_list &C , const int index)
+{
+  Linked_list* current = &Head;
+
+  for (int i = 0 ; i < index ; ++i)
+  {
+    current = current->next.get();
+  } // A -> B -> B -> D ;=> A -> B -> C -> D; 
+
+  auto temp = std::make_unique<Linked_list> (); //temp ~= B;=> B -> temp;?????
+  temp->name = current->name;
+  temp->num = current->num;
+  temp->next = std::move(current->next);
+
 }
 
 int main()
