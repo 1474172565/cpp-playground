@@ -7,7 +7,7 @@
   目标： 完成一个 Linked_list 链表 
   功能： 尾部构造（传入值） ， 尾部插入（传入链表） ， 定点插入（不可尾插） ， 定点后序列删除 ， 定点删除 ， 打印链表（以键值对形式）；
   规划： 结构体(已完成) => 类封装 => 自己的STL库（自定义链表）; 
-  高级语法： C11 unique_ptr , C17 std::move;  
+  高级语法： C11 unique_ptr , std::move;  
 */
 
 struct Linked_list{
@@ -83,6 +83,8 @@ void erase_List_at(Linked_list &Head , const int index)
   {
     current = current->next.get();
   }// A -> B -> C -> D => A -> B -> D; B->next = std::move(C->next); C被自动释放；当 index = 1 时 ， B 即为current；
+
+  if(current->next == nullptr) {return ;} // 防止UB； 其实放到上面循环更好 ， 但是我觉得让编译器 在运行时 告诉用户错误 比藏起来更好；   还不会抛异常......
 
   current->next = std::move(current->next->next);
 }
