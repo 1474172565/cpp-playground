@@ -12,8 +12,10 @@
 
 struct Linked_list{
   std::string name;
-  long num;
+  int num;
   std::unique_ptr<Linked_list> next;
+
+  Linked_list (const std::string &Name , const int Num , std::unique_ptr<Linked_list> Next) : name(Name) , num(Num) , next(std::move(Next)){}
 };
 
 void emplace_list(Linked_list &Head , const std::string &name ,const int num) // 在链表后加上新的链表（构造）；
@@ -24,9 +26,7 @@ void emplace_list(Linked_list &Head , const std::string &name ,const int num) //
     current = current->next.get();
   }
   
-  current->next = std::make_unique<Linked_list> ();//构造初始化 current->next = std::make_unique<Linked_list> (Linked_list{name , num});
-  current->next->name = name;
-  current->next->num = num;
+  current->next = std::make_unique<Linked_list> (Linked_list{name , num , nullptr});//构造初始化 current->next = std::make_unique<Linked_list> (Linked_list{name , num});
 }
 
 void Push_back(Linked_list &Head , Linked_list &B)//把链表 放到 最后 （赋值）
@@ -38,10 +38,7 @@ void Push_back(Linked_list &Head , Linked_list &B)//把链表 放到 最后 （�
     current = current->next.get();
   }
 
-  auto middle = std::make_unique<Linked_list> ();
-  middle->name = B.name;
-  middle->num = B.num;
-  middle->next = nullptr;
+  auto middle = std::make_unique<Linked_list> (B.name , B.num , std::move(B.next));
 
   current->next = std::move(middle); //Linked_list* b.......... '\n' current->next.reset(b); 堆上 unique 指针 不能管理 栈上的 指针 ， 用make_unique
 }
@@ -56,12 +53,7 @@ void Insert_list(Linked_list &Head , Linked_list &C , const int index)
 
   if(current->next.get() == nullptr) {return;}
 
-  auto b = std::make_unique<Linked_list> ();
-
-  b->name = C.name;
-  b->num = C.num;
-  
-  b->next = std::move(current->next);
+  auto b = std::make_unique<Linked_list> (C.name , C.num , std::move(C.next));
   current->next = std::move(b);
 }
 
@@ -99,13 +91,10 @@ void Print_list(Linked_list &Head){// 逐个打印
   }
 }
 
-
-
-
 int main()
 {
-  Linked_list A{"105" , 1};
-  Linked_list B{"AKA" , 123};
+  Linked_list A{"105" , 1 , nullptr};
+  Linked_list B{"AKA" , 123 , nullptr};
   emplace_list(A , "106" , 2);
   emplace_list(A , "107" , 3);
   emplace_list(A , "108" , 4);
