@@ -10,40 +10,41 @@
   高级语法： C11 unique_ptr , std::move;  
 */
 
-struct Linked_list{
+class Linked_list{
+private:
   std::string name;
   int num;
   std::unique_ptr<Linked_list> next;
 
-  Linked_list (const std::string &Name , const int Num , std::unique_ptr<Linked_list> Next) : name(Name) , num(Num) , next(std::move(Next)){}
-};
+public:
+  Linked_list (const std::string &Name , const int Num , std::unique_ptr<Linked_list> Next) : name(Name) , num(Num) , next(std::move(Next)){};
 
-void emplace_list(Linked_list &Head , const std::string &name ,const int num) // 在链表后加上新的链表（构造）；
-{
-  Linked_list* current = &Head;
-  while(current->next != nullptr)
+  void emplace_list(Linked_list &Head , const std::string &name ,const int num) // 在链表后加上新的链表（构造）；
   {
-    current = current->next.get();
-  }
-  
-  current->next = std::make_unique<Linked_list> (Linked_list{name , num , nullptr});//构造初始化 current->next = std::make_unique<Linked_list> (Linked_list{name , num});
-}
-
-void Push_back(Linked_list &Head , Linked_list &B)//把链表 放到 最后 （赋值）
-{
-  Linked_list* current = &Head;
-
-  while(current->next != nullptr)
-  {
-    current = current->next.get();
+    Linked_list* current = &Head;
+    while(current->next != nullptr)
+    {
+      current = current->next.get();
+    }
+    
+    current->next = std::make_unique<Linked_list> (Linked_list{name , num , nullptr});//构造初始化 current->next = std::make_unique<Linked_list> (Linked_list{name , num});
   }
 
-  auto middle = std::make_unique<Linked_list> (B.name , B.num , std::move(B.next));
+  void Push_back(Linked_list &Head , Linked_list &B)//把链表 放到 最后 （赋值）
+  {
+    Linked_list* current = &Head;
 
-  current->next = std::move(middle); //Linked_list* b.......... '\n' current->next.reset(b); 堆上 unique 指针 不能管理 栈上的 指针 ， 用make_unique
-}
+    while(current->next != nullptr)
+    {
+      current = current->next.get();
+    }
 
-void Insert_list(Linked_list &Head , Linked_list &C , const int index)
+    auto middle = std::make_unique<Linked_list> (B.name , B.num , std::move(B.next));
+
+    current->next = std::move(middle); //Linked_list* b.......... '\n' current->next.reset(b); 堆上 unique 指针 不能管理 栈上的 指针 ， 用make_unique
+  }
+
+  void Insert_list(Linked_list &Head , Linked_list &C , const int index)
 {
   Linked_list* current = &Head;
   for(int i = 0 ; i < index ; ++i)
@@ -56,7 +57,7 @@ void Insert_list(Linked_list &Head , Linked_list &C , const int index)
   auto b = std::make_unique<Linked_list> (C.name , C.num , std::move(C.next));
   current->next = std::move(b);
 }
-
+   
 void erase_list_all(Linked_list &Head , const int index) // 第 index 个链表之后删除
 {
   Linked_list* current = &Head;
@@ -90,20 +91,18 @@ void Print_list(Linked_list &Head){// 逐个打印
     current = current->next.get();
   }
 }
+};
+
+// struct Linked_list{
+//   std::string name;
+//   int num;
+//   std::unique_ptr<Linked_list> next;
+
+//   Linked_list (const std::string &Name , const int Num , std::unique_ptr<Linked_list> Next) : name(Name) , num(Num) , next(std::move(Next)){}
+// };
+
 
 int main()
 {
-  Linked_list A{"105" , 1 , nullptr};
-  Linked_list B{"AKA" , 123 , nullptr};
-  emplace_list(A , "106" , 2);
-  emplace_list(A , "107" , 3);
-  emplace_list(A , "108" , 4);
-  Push_back(A, B);
-  Print_list(A);
-
-  erase_list_all(A, 2);
-
-  std::cout << '\n';
-  Print_list(A);
   return 0;
 }
